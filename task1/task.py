@@ -1,9 +1,9 @@
 import pyodbc
 
-jserver = "JaredPC\JS_1"
-jdatabase = "TASK"
-jusername = "sa"
-jpassword = "passw0rd"
+jserver = "databases1.spartaglobal.academy"
+jdatabase = "Northwind"
+jusername = "SA"
+jpassword = "Passw0rd2018"
 
 class SQLInstance:
     # When instantiating this class, it will connect automatically as inputted
@@ -16,7 +16,6 @@ class SQLInstance:
                 UID={username};
                 PWD={password}""")
         self.cursor = self.connection.cursor()
-        self.choices()
 
 
     # Makes a table
@@ -43,10 +42,19 @@ class SQLInstance:
 
         # The query string will have an extra comma at the end, this removes it
         query_string = query_string[:length-1]
+        query = f"CREATE TABLE {table_name} ({query_string});"
 
+        if not self.yesno_to_query(query):
+            print("\nNothing done")
+            return input("\nPress <Enter> to go back to the menu")
+        
         # This will create the table and commit it
-        self.cursor.execute(f"CREATE TABLE {table_name} ({query_string});")
-        self.connection.commit()
+        try:
+            self.cursor.execute(query)
+            self.connection.commit()
+            print("\nTable created!")
+        except:
+            print("\nError! Nothing happened")
 
 
     # Allows one to insert a row into a table
@@ -186,7 +194,6 @@ class SQLInstance:
 
             elif int(choice) == 2:
                 self.make_table()
-                print("\nTable created!")
 
 
             elif int(choice) == 3:
@@ -207,3 +214,4 @@ class SQLInstance:
 
 if __name__ == "__main__":
     c = SQLInstance(jserver, jdatabase, jusername, jpassword)
+    c.choices()

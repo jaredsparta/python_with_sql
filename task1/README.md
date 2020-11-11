@@ -49,6 +49,7 @@
 - I then create a class method that will enable one to create a table within the database:
 ```python
     # Makes a table
+    # CHECKED - YES
     def make_table(self):
         table_name = input("\nWhat should the table be called?\n--> ")
         # Not inputting an integer will cause an error so I will catch it
@@ -71,10 +72,19 @@
 
         # The query string will have an extra comma at the end, this removes it
         query_string = query_string[:length-1]
+        query = f"CREATE TABLE {table_name} ({query_string});"
 
+        if not self.yesno_to_query(query):
+            print("\nNothing done")
+            return input("\nPress <Enter> to go back to the menu")
+        
         # This will create the table and commit it
-        self.cursor.execute(f"CREATE TABLE {table_name} ({query_string});")
-        self.connection.commit()
+        try:
+            self.cursor.execute(query)
+            self.connection.commit()
+            print("\nTable created!")
+        except:
+            print("\nError! Nothing happened")
 ```
 
 <br>
@@ -194,7 +204,6 @@
 
             elif int(choice) == 2:
                 self.make_table()
-                print("\nTable created!")
 
 
             elif int(choice) == 3:
@@ -227,8 +236,6 @@
                 UID={username};
                 PWD={password}""")
         self.cursor = self.connection.cursor()
-        self.choices()
-
 ```
 
 <br>
@@ -275,4 +282,6 @@
     # Where the arguements will be the correct server, DB, user and password
     if __name__ == "__main__":
         c = SQLInstance(jserver, jdatabase, jusername, jpassword)
+        c.choices()
+
 ```
