@@ -6,6 +6,10 @@ jusername = "SA"
 jpassword = "Passw0rd2018"
 
 class SQLInstance:
+    # So when I create an object of this class, it will automatically connect
+    # to the server and DB as inputted
+    # It will also createa cursor to use
+    # I then call the choices method
     def __init__(self, server, database, username, password):
         self.connection = self.make_connection(server, database, username, password)
         self.cursor = self.connection.cursor()
@@ -54,22 +58,31 @@ class SQLInstance:
 
     # Allows one to insert a row into a table
     def insert_into(self):
+        # Asks for the table's name, the columns to add to and their values
         table_name = input("Which table are you adding values to? ").strip()
         query_cols = input("Which columns are you adding to?\n")
         query_vals = input("What are the values?\n")
 
+        # Creates the query to do so and asks if it's what they wanted
         query = f"INSERT INTO {table_name} ({query_cols}) VALUES ({query_vals})"
-        print("The current query is:")
-        print(query)
+        print(f"\nThe current query is: {query}")
 
-        continue = input("Would you like to continue? (Y/N)").strip()
-        if continue == "Y":
-            self.cursor.execute(query)
-            self.connection.commit()
+
+        # Changing a table can be a big error so I put this in just in case
+        choice = input("Would you like to continue? (Y/N) ").strip()
+        if choice == "Y":
+            try:
+                self.cursor.execute(query)
+                self.connection.commit()
+                print("\nRow added!")
+            except:
+                print("\nSomething went wrong")
 
     # Allows one to query a database
     def query_db(self):
+        # This is the query string
         query_str = input("Insert your query:\n")
+        # If the query causes an error, this will catch it
         try:
             result = self.cursor.execute(query_str)
             for row in result:
@@ -80,15 +93,22 @@ class SQLInstance:
 
     # Allows one to add a column to a table
     def add_column(self):
+        # Ask for the table to add to, the column name and its datatype
         table_name = input("\nWhich table to add a column? ").strip()
         col_name = input("What's the column name? ")
         col_datatype = input("What's the datatype? ")
         query = f"ALTER TABLE {table_name} ADD {col_name} {col_datatype};"
-        self.cursor.execute(query)
-        self.connection.commit()
-
-        print("Column added!")
-
+        
+        print(f"\nThe current query is: {query}")
+        
+        choice = input("Would you like to continue? (Y/N) ").strip().upper()
+        if choice == "Y":
+            try:
+                self.cursor.execute(query)
+                self.connection.commit()
+                print("\nColumn added!")
+            except:
+                print("\nSomething went wrong")
 
     # Menu for what to do
     def choices(self):
@@ -104,21 +124,24 @@ class SQLInstance:
             if int(choice) == 1:
                 self.query_db()
 
+
             elif int(choice) == 2:
                 self.make_table()
                 print("\nTable created!")
 
+
             elif int(choice) == 3:
                 self.insert_into()
-                print("\nYou've inserted data!")
 
 
             elif int(choice) == 4:
+                self.add_column()
 
 
             elif int(choice) == 5:
                 break
             
+
             else:
                 print("\nNot an option!")
 
