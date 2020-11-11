@@ -5,7 +5,7 @@ jdatabase = "Northwind"
 jusername = "SA"
 jpassword = "Passw0rd2018"
 
-class SQLAutoConnection:
+class SQLInstance:
     def __init__(self, server, database, username, password):
         self.connection = self.make_connection(server, database, username, password)
         self.cursor = self.connection.cursor()
@@ -23,9 +23,10 @@ class SQLAutoConnection:
         return connection
 
 
-    # Creates a query using .execute()
+    # Makes a table
     def make_table(self):
         table_name = input("\nWhat should the table be called?\n--> ")
+        # Not inputting an integer will cause an error so I will catch it
         while True:
             try:
                 number_of_col = int(input("\nHow many columns?\n--> "))
@@ -33,29 +34,42 @@ class SQLAutoConnection:
             except:
                 continue
         
+        # This will be the query used to create the table
         query_string = ""
         length = len(query_string)
-                
+        
+        # This will ask for the names and datatypes for the table
         for _ in range(number_of_col):
             col_name = input(f"\nInput name of column {_ + 1}: ")
             col_datatype = input(f"Input the datatype of this column: ")
             query_string = query_string + col_name + " " + col_datatype + ","
 
+        # The query string will have an extra comma at the end, this removes it
         query_string = query_string[:length-1]
 
+        # This will create the table and commit it
         self.cursor.execute(f"CREATE TABLE {table_name} ({query_string});")
         self.connection.commit()
 
 
-    # Allows one to insert data into a table
+    # Allows one to insert a row into a table
     def insert_into(self):
-        query = input("Input in a valid format your insert statement:\n")
-        self.cursor.execute(query)
-        self.connection.commit()
+        table_name = input("Which table are you adding values to? ").strip()
+        query_cols = input("Which columns are you adding to?\n")
+        query_vals = input("What are the values?\n")
 
+        query = f"INSERT INTO {table_name} ({query_cols}) VALUES ({query_vals})"
+        print("The current query is:")
+        print(query)
 
+        continue = input("Would you like to continue? (Y/N)").strip()
+        if continue == "Y":
+            self.cursor.execute(query)
+            self.connection.commit()
+
+    # Allows one to query a database
     def query_db(self):
-        query_str = input("Insert your  query:\n")
+        query_str = input("Insert your query:\n")
         try:
             result = self.cursor.execute(query_str)
             for row in result:
@@ -64,29 +78,50 @@ class SQLAutoConnection:
             print("\nError!")
 
 
+    # Allows one to add a column to a table
+    def add_column(self):
+        table_name = input("\nWhich table to add a column? ").strip()
+        col_name = input("What's the column name? ")
+        col_datatype = input("What's the datatype? ")
+        query = f"ALTER TABLE {table_name} ADD {col_name} {col_datatype};"
+        self.cursor.execute(query)
+        self.connection.commit()
+
+        print("Column added!")
+
+
+    # Menu for what to do
     def choices(self):
         while True:
             print("""\nOptions:
-                        1. Make table
-                        2. Insert values into a table
-                        3. Query
-                        4. Exit""")
+                        1. Query
+                        2. Make table
+                        3. Add a row to a table
+                        4. Add a column to a table
+                        5. Exit""")
             choice = input("---> ").strip()
 
             if int(choice) == 1:
+                self.query_db()
+
+            elif int(choice) == 2:
                 self.make_table()
                 print("\nTable created!")
 
-            if int(choice) == 2:
+            elif int(choice) == 3:
                 self.insert_into()
                 print("\nYou've inserted data!")
 
-            if int(choice) == 3:
-                self.query_db()
 
-            if int(choice) == 4:
+            elif int(choice) == 4:
+
+
+            elif int(choice) == 5:
                 break
             
+            else:
+                print("\nNot an option!")
+
 
 if __name__ == "__main__":
-    c = SQLAutoConnection(jserver, jdatabase, jusername, jpassword)
+    c = SQLInstance(jserver, jdatabase, jusername, jpassword)
