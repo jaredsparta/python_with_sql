@@ -9,8 +9,8 @@ class SQLAutoConnection:
     def __init__(self, server, database, username, password):
         self.connection = self.make_connection(server, database, username, password)
         self.cursor = self.connection.cursor()
+        self.choices()
         
-
 
     # Creates a connection with the following inputs
     def make_connection(self, server, database, username, password):
@@ -57,7 +57,9 @@ class SQLAutoConnection:
     def query_db(self):
         query_str = input("Insert your  query:\n")
         try:
-            self.cursor.execute(query_str)
+            result = self.cursor.execute(query_str)
+            for row in result:
+                print(row)
         except:
             print("\nError!")
 
@@ -80,7 +82,7 @@ class SQLAutoConnection:
                 print("\nYou've inserted data!")
 
             if int(choice) == 3:
-                pass
+                self.query_db()
 
             if int(choice) == 4:
                 break
@@ -88,5 +90,3 @@ class SQLAutoConnection:
 
 if __name__ == "__main__":
     c = SQLAutoConnection(jserver, jdatabase, jusername, jpassword)
-    row = c.cursor.execute("SELECT * FROM JS_table")
-    print(row)
