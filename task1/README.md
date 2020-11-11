@@ -2,6 +2,9 @@
 
 ![](images/task1.png)
 
+**Notes**
+- This was tested on a local SQL server to avoid connection issues. In this environment, the program runs smoothly.
+
 **Explanation**
 - As always, we will need ```pyodbc``` so install it into the environment with ```pip install pyodbc``` and import it using ```import pyodbc```.
 
