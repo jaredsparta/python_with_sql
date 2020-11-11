@@ -1,33 +1,26 @@
 import pyodbc
 
-jserver = "databases1.spartaglobal.academy"
-jdatabase = "Northwind"
-jusername = "SA"
-jpassword = "Passw0rd2018"
+jserver = "JaredPC\JS_1"
+jdatabase = "TASK"
+jusername = "sa"
+jpassword = "passw0rd"
 
 class SQLInstance:
-    # So when I create an object of this class, it will automatically connect
-    # to the server and DB as inputted
-    # It will also createa cursor to use
-    # I then call the choices method
+    # When instantiating this class, it will connect automatically as inputted
+    # It will also create a cursor to use and create a cursor
     def __init__(self, server, database, username, password):
-        self.connection = self.make_connection(server, database, username, password)
-        self.cursor = self.connection.cursor()
-        self.choices()
-        
-
-    # Creates a connection with the following inputs
-    def make_connection(self, server, database, username, password):
-        connection = pyodbc.connect(f"""
+        self.connection = pyodbc.connect(f"""
                 DRIVER=ODBC Driver 17 for SQL Server;
                 SERVER={server};
                 DATABASE={database};
                 UID={username};
                 PWD={password}""")
-        return connection
+        self.cursor = self.connection.cursor()
+        self.choices()
 
 
     # Makes a table
+    # CHECKED - YES
     def make_table(self):
         table_name = input("\nWhat should the table be called?\n--> ")
         # Not inputting an integer will cause an error so I will catch it
@@ -57,63 +50,123 @@ class SQLInstance:
 
 
     # Allows one to insert a row into a table
+    # CHECKED - YES
     def insert_into(self):
-        # Asks for the table's name, the columns to add to and their values
-        table_name = input("Which table are you adding values to? ").strip()
-        query_cols = input("Which columns are you adding to?\n")
-        query_vals = input("What are the values?\n")
+        # Prints possible tables to insert rows into
+        self.show_possible_tables()
+        table_name = input("Which table are we inserting into?\n").strip()
 
-        # Creates the query to do so and asks if it's what they wanted
-        query = f"INSERT INTO {table_name} ({query_cols}) VALUES ({query_vals})"
-        print(f"\nThe current query is: {query}")
+        # This shows the possible columns
+        self.show_col_names(table_name)
+        column_names = input("Which columns are values being added to? (separate column names with commas)\n")
+        
+        # Asks for the values to input
+        values = input("\nWhat are the values? (separate values by commas and make sure you input them as the proper datatype)\n")
+        query = f"INSERT INTO {table_name} ({column_names}) VALUES ({values})"
 
+        # Checks if they want to go through with it
+        if not self.yesno_to_query(query):
+            print("\nNothing done")
+            return input("\nPress <Enter> to go back to the menu")
 
-        # Changing a table can be a big error so I put this in just in case
-        choice = input("Would you like to continue? (Y/N) ").strip()
-        if choice == "Y":
-            try:
-                self.cursor.execute(query)
-                self.connection.commit()
-                print("\nRow added!")
-            except:
-                print("\nSomething went wrong")
+        # Many errors could occur due to the numerous numbers of possible queries
+        # If one occurs, then nothing will happen
+        try:
+            self.cursor.execute(query)
+            self.connection.commit()
+            print("Row added!")
+        except:
+            print("\nSomething went wrong! Nothing has been done")
+
 
     # Allows one to query a database
+    # CHECKED - YES
     def query_db(self):
+        self.show_possible_tables()
         # This is the query string
-        query_str = input("Insert your query:\n")
+        query = input("\nInsert your query:\n")
+
+        if not self.yesno_to_query(query):
+            print("\nNothing done")
+            return input("\nPress <Enter> to go back to the menu")
+        
         # If the query causes an error, this will catch it
         try:
-            result = self.cursor.execute(query_str)
+            result = self.cursor.execute(query)
+            print("\nResults:")
             for row in result:
                 print(row)
         except:
-            print("\nError!")
+            print("\nError! \nCheck query syntax!")
+
+        input("\nPress <Enter> to go back to the menu")
 
 
-    # Allows one to add a column to a table
-    def add_column(self):
-        # Ask for the table to add to, the column name and its datatype
-        table_name = input("\nWhich table to add a column? ").strip()
-        col_name = input("What's the column name? ")
-        col_datatype = input("What's the datatype? ")
-        query = f"ALTER TABLE {table_name} ADD {col_name} {col_datatype};"
+    # This adds a new column into the table
+    def add_col(self):
+        # Shows available tables
+        self.show_possible_tables()
+        table_name = input("Which table are we inserting into?\n").strip()
+
+        # Shows the columns already in the table
+        self.show_col_names(table_name)
+        new_col_name = input("What is the new column name?\n")
+        new_col_dt = input("What datatype will it hold? e.g. varchar(255)\n")
+        query = f"ALTER TABLE {table_name} ADD {new_col_name} {new_col_dt}"
+
+        # Double-checks if they want to add a new column
+        if not self.yesno_to_query(query):
+            print("Nothing done")
+            return input("Press <Enter> to go back to the menu")
+
+        try:
+            self.cursor.execute(query)
+            self.connection.commit()
+            print("\nNew column added!")
+        except:
+            print("Something went wrong! Nothing has been done")
+
+
+    # This will return the possible tables
+    # I made it a method as I re-used this code thus implementing DRY
+    def show_possible_tables(self):
+        y = self.cursor.execute("SELECT * FROM information_schema.tables")
+        table_list = []
+        for _ in y:
+            table_list.append(_[2])
+        print(f"\nThe available tables are: {table_list}")
+
+
+    # This outputs all column names in the table
+    # I made it a method since I used it more than once
+    def show_col_names(self, table_name):
+        x = self.cursor.execute(f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{table_name}'")
+        list = []
+        for _ in x:
+            list.append(_[0])
+        print(f"\nThese are the current columns: {list}")
+
+
+    # This will return yes or no depending on if the user wants to continue with their query
+    # I made it a method as I re-use this code as well
+    def yesno_to_query(self, query):
+        print("="*30)
+        print(f"\nThe current query is:\n{query}")
+        choice = input("\nWould you like to continue? (Y/N) ").strip().upper()
         
-        print(f"\nThe current query is: {query}")
-        
-        choice = input("Would you like to continue? (Y/N) ").strip().upper()
         if choice == "Y":
-            try:
-                self.cursor.execute(query)
-                self.connection.commit()
-                print("\nColumn added!")
-            except:
-                print("\nSomething went wrong")
+            return True
+        elif choice == "N":
+            return False
+        else:
+            return self.yesno_to_query(query)
+
 
     # Menu for what to do
     def choices(self):
         while True:
-            print("""\nOptions:
+            print("""\n
+                        Options:
                         1. Query
                         2. Make table
                         3. Add a row to a table
@@ -121,7 +174,13 @@ class SQLInstance:
                         5. Exit""")
             choice = input("---> ").strip()
 
-            if int(choice) == 1:
+            # This will deal with inputs that aren't numbers
+            # I put this as the first check as trying int(choice) to a string
+            # will break the program
+            if not choice.isdigit():
+                print("\nNot an option!")
+
+            elif int(choice) == 1:
                 self.query_db()
 
 
@@ -135,12 +194,12 @@ class SQLInstance:
 
 
             elif int(choice) == 4:
-                self.add_column()
-
-
+                self.add_col()
+            
+            
             elif int(choice) == 5:
                 break
-            
+
 
             else:
                 print("\nNot an option!")
