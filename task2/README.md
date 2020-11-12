@@ -101,7 +101,7 @@
         try:
             x = self.cursor.execute("SELECT * FROM Movies")
             for _ in x:
-                print(x)
+                print(_)
         except:
             print("\nError! Are you sure there's a table called Movies?")
 
