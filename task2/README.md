@@ -10,6 +10,7 @@
 
 **Notes**
 - I did test this code on a local SQL server instead of Sparta's AWS servers, due to potential connectivity issues. In that environment, this program did work as intended.
+- **REMEMBER TO SWITCH THE SERVER, DATABASE, USERNAME AND PASSWORD IN THE ```if __name__ == '__main__':``` CODE BLOCK**
 - The ```test.csv``` file was used to test ```Option 4``` in my code.
 
 <br>
