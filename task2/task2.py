@@ -64,7 +64,7 @@ class ProductsManager:
     # Shows all the data for the films
     def show_all_movies(self):
         try:
-            x = self.cursor.execute("SELECT * FROM Movies")
+            x = self.cursor.execute("SELECT * FROM Movies WHERE titleType = 'movie'")
             for _ in x:
                 print(_)
         except:
