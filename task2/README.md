@@ -1,9 +1,18 @@
-# Task
+# Task 2
 
 ![](images/task2.png)
 
 **Limitations**
 - Sometimes, when the ```csv``` file is not properly encoded as utf-8 some weird characters are found, breaking the program. To overcome this, I had to hardcode the column titles.
+- There was too much variation within ```.csv``` files to allow a more efficient way of creating tables to be done using my current knowledge. There could perhaps be a few python libraries I'm not aware of to fix this issue. Overall, with time allowed and my knowledge taken into consideration, this was the only way I saw how to achieve the acceptance criteria.
+
+<br>
+
+**Notes**
+- I did test this code on a local SQL server instead of Sparta's AWS servers, due to potential connectivity issues. In that environment, this program did work as intended.
+- The ```test.csv``` file was used to test ```Option 4``` in my code.
+
+<br>
 
 **Pre-requisites**
 - One will need to install ```pyodbc``` using ```pip install pyodbc```.
@@ -12,6 +21,8 @@
     import pyodbc
     import csv
 ```
+
+<br>
 
 **Explanation**
 - I create a class and put the server connection and cursor into the init method:
@@ -109,11 +120,12 @@
 <br>
 
 - This option will let the user convert rows they choose into a ```.csv``` file. I indicate which movies via their primaryTitle.
+- 
 ```python
     # OPTION 3
     # Choose movies and convert them into .csv
     def make_into_csv(self):
-        name = input("\nWhat is the name of the .csv file? (please include .csv at the end)" )
+        name = input("\nWhat is the name of the .csv file? (please include .csv at the end) " )
         films = input("Please list the primaryTitle of each film you want to export separated by commas:\n")
         film_list = films.split(",")
         with open(f"task2/{name}", "w", newline="") as file:
@@ -125,9 +137,46 @@
 
 <br>
 
-- This will just let someone query the table. Note that this should only be used for ```SELECT``` statements.
+- If the user has another ```.csv``` file, they can also add this information into the table ```Movies``` using this method. This is taken from code in ```Option 0```.
 ```python
     # OPTION 4
+    # Uses another .csv file to add values in the table
+    # This block of code is repeated from OPTION 0
+    # A better way to write this would be to have a separate method to insert
+    # values into a database and vice-versa
+    def add_more_movies(self):
+        csv_file = input("\nInput path to file:\n")
+        with open(csv_file, newline='') as csvfile:
+                rows = csv.reader(csvfile)
+                # Iterates through all the rows
+                for row in rows:
+                    for num in range(8):
+                        row[num] = f"'{row[num]}'"
+                    q2 = ",".join(row)
+                    query = f"""INSERT INTO Movies (titleType,
+                                                    primaryTitle,
+                                                    originalTitle,
+                                                    isAdult,
+                                                    startYear,
+                                                    endYear,
+                                                    runtimeMinutes,
+                                                    genres)
+                                VALUES ({q2})"""
+                    # Some rows in a csv file cause a problem
+                    # Need to find a way to fix this bit
+                    try:
+                        self.cursor.execute(query)
+                        self.connection.commit()
+                    except:
+                        continue
+
+```
+
+<br>
+
+- This will just let someone query the table. Note that this should only be used for ```SELECT``` statements.
+```python
+    # OPTION 5
     # Query the DB
     def query_db(self):
         query = input("\nType your query:\n")
@@ -192,7 +241,7 @@
 
 <br>
 
-- Finally, I run the program:
+- Finally, I run the program. I tested this code on a local SQL server for ease and to eliminate connectivity issues. On that server, the code worked as intended.
 ```python
     if __name__ == "__main__":
     server = "JaredPC\JS_1"

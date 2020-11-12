@@ -79,7 +79,7 @@ class ProductsManager:
     # OPTION 3
     # Choose movies and convert them into .csv
     def make_into_csv(self):
-        name = input("\nWhat is the name of the .csv file? (please include .csv at the end)" )
+        name = input("\nWhat is the name of the .csv file? (please include .csv at the end) " )
         films = input("Please list the primaryTitle of each film you want to export separated by commas:\n")
         film_list = films.split(",")
         with open(f"task2/{name}", "w", newline="") as file:
@@ -89,7 +89,42 @@ class ProductsManager:
                 writer.writerow(y)
 
 
+
+
     # OPTION 4
+    # Uses another .csv file to add values in the table
+    # This block of code is repeated from OPTION 0
+    # A better way to write this would be to have a separate method to insert
+    # values into a database and vice-versa
+    def add_more_movies(self):
+        csv_file = input("\nInput path to file:\n")
+        with open(csv_file, newline='') as csvfile:
+                rows = csv.reader(csvfile)
+                # Iterates through all the rows
+                for row in rows:
+                    for num in range(8):
+                        row[num] = f"'{row[num]}'"
+                    q2 = ",".join(row)
+                    query = f"""INSERT INTO Movies (titleType,
+                                                    primaryTitle,
+                                                    originalTitle,
+                                                    isAdult,
+                                                    startYear,
+                                                    endYear,
+                                                    runtimeMinutes,
+                                                    genres)
+                                VALUES ({q2})"""
+                    # Some rows in a csv file cause a problem
+                    # Need to find a way to fix this bit
+                    try:
+                        self.cursor.execute(query)
+                        self.connection.commit()
+                    except:
+                        continue
+
+
+
+    # OPTION 5
     # Query the DB
     def query_db(self):
         query = input("\nType your query:\n")
@@ -100,18 +135,19 @@ class ProductsManager:
         except:
             return print("\nError! Try again")
 
-            
+
     def choices(self):
         while True:
             # Shows options the user can do
             print("""
                     Options:
-                    0. Convert the .csv file into a table in the Database
+                    0. Convert the imdbtitles.csv file into a table in the Database
                     1. Show all movie data
                     2. Search movies by title and return data
-                    3. Choose movies and convert their data into a .txt file
-                    4. Query the database
-                    5. EXIT
+                    3. Choose movies and convert their data into a .csv file
+                    4. Add more movies using another .csv file
+                    5. Query the database
+                    6. EXIT
                     """)
             choose = input("--->  ")
 
@@ -132,11 +168,15 @@ class ProductsManager:
             
 
             elif int(choose) == 4:
+                self.add_more_movies()
+
+
+            elif int(choose) == 5:
                 self.query_db()
-            
+        
 
             # Exits the loop
-            elif int(choose) == 5:
+            elif int(choose) == 6:
                 break
             
 
