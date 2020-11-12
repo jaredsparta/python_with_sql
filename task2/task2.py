@@ -1,10 +1,10 @@
 import pyodbc
 import csv
 
-# 
 
 class ProductsManager:
     def __init__(self, server, database, username, password):
+        # Connects to the server automatically
         self.connection = pyodbc.connect(f"""
                 DRIVER=ODBC Driver 17 for SQL Server;
                 SERVER={server};
@@ -15,58 +15,92 @@ class ProductsManager:
 
     # OPTION 0
     # Should be the first option - creates a table from .csv file
-    def create_table_from_csv(self):
-        csv_file = input("\nGive the relative path to the .csv file: ")
-        table_name = input("What should the table be called? ")
-        col_names = []
-        with open(csv_file, newline='') as csvfile:
-            rows = csv.reader(csvfile)
-            for r in rows:
-                col_names = r
-                break
+    def create_table(self):
+        # Creating the query and running it is the best way to do it
+        query = """CREATE TABLE Movies (
+                        titleType varchar(255),
+                        primaryTitle varchar(255),
+                        originalTitle varchar(255),
+                        isAdult varchar(255),
+                        startYear varchar(255),
+                        endYear varchar(255),
+                        runtimeMinutes varchar(255),
+                        genres varchar(255))"""
+        self.cursor.execute(query)
+        self.connection.commit()
+    
+        # This will open the csv file and insert data one-by-one into the table
+        with open("task2/imdbtitles.csv", newline='') as csvfile:
+                rows = csv.reader(csvfile)
+                # The first row contains only the column names so I skip it using iter and next
+                next(iter(rows))
+                # Iterates through all the rows
+                for row in rows:
+                    for num in range(8):
+                        row[num] = f"'{row[num]}'"
 
-        query_2 = ""
-        for name in col_names:
-            query_2 += name + " varchar(255),"
-        print(query_2)
-        query_2 = query_2[12:len(query_2)-1]     
-        
-        query = ascii(f"CREATE TABLE {table_name} ({query_2}) ")
-        print(query)
-        #try:
-        #    self.cursor.execute(query)
-        #    self.commit()
-        #except:
-        #    return print("Something went wrong!")
-        #
-        #print("\nTable created!")
-        #input("Press <ENTER> to put all values in the table")
-        #col_names2 = ",".join(col_names)
-        #with open(csv_file, newline='', fileEncoding="UTF-8-BOM") as csvfile:
-        #    rows = csv.reader(csvfile)
-        #    next(iter(rows))
-        #    for row in rows:
-        #        q2 = ",".join(row)
-        #        q = f"INSERT INTO {table_name} ({col_names2}) VALUES ({q2})"
-        #        self.cursor.execute(q)
-        #        self.commit()
-
+                    q2 = ",".join(row)
+                    query = f"""INSERT INTO Movies (titleType,
+                                                    primaryTitle,
+                                                    originalTitle,
+                                                    isAdult,
+                                                    startYear,
+                                                    endYear,
+                                                    runtimeMinutes,
+                                                    genres)
+                                VALUES ({q2})"""
+                    # Some rows in the csv file cause a problem
+                    # Need to find a way to fix this bit
+                    try:
+                        self.cursor.execute(query)
+                        self.connection.commit()
+                    except:
+                        continue
 
     # OPTION 1
     # Shows all the data for the films
     def show_all_movies(self):
-        pass
+        x = self.cursor.execute("SELECT * FROM Movies")
+        for _ in x:
+            print(x)
 
     # OPTION 2
     # Search data by film title
     def show_data_for_title(self):
-        title = input("\nWhat title are you looking for? ")
+        title = input("\nWhat title are you looking for? ").title().strip()
         query = f"SELECT * FROM Movies WHERE primaryTitle = {title}"
         try:
-            self.cursor.execute(query)
+            y = self.cursor.execute(query).fetchone()
+            print(y)
         except:
             return print("Something went wrong!")
 
+
+    # OPTION 3
+    # Choose movies and convert them into .csv
+    def make_into_csv(self):
+        name = input("\nWhat is the name of the .csv file? (please include .csv at the end)" )
+        films = input("Please list the primaryTitle of each film you want to export separated by commas:\n")
+        film_list = films.split(",")
+        with open(f"task2/{name}", "w", newline="") as file:
+            writer = csv.writer(file)
+            for film in film_list:
+                y = self.cursor.execute(f"SELECT * FROM Movies WHERE primaryTitle = '{film.strip()}'").fetchone()
+                writer.writerow(y)
+
+
+    # OPTION 4
+    # Query the DB
+    def query_db(self):
+        query = input("\nType your query:\n")
+        try:
+            y = self.cursor.execute(query)
+            for row in y:
+                print(row)
+        except:
+            return print("\nError! Try again")
+
+            
     def choices(self):
         while True:
             # Shows options the user can do
@@ -76,9 +110,8 @@ class ProductsManager:
                     1. Show all movie data
                     2. Search movies by title and return data
                     3. Choose movies and convert their data into a .txt file
-                    4. Retrieve data from the database and convert it into a .txt file
-                    5. Query the database
-                    6. EXIT
+                    4. Query the database
+                    5. EXIT
                     """)
             choose = input("--->  ")
 
@@ -87,32 +120,28 @@ class ProductsManager:
 
 
             elif int(choose) == 1:
-                pass
+                self.show_all_movies()
             
 
             elif int(choose) == 2:
-                pass
+                self.show_data_for_title()
             
 
             elif int(choose) == 3:
-                pass
+                self.make_into_csv()
             
 
             elif int(choose) == 4:
-                pass
-            
-
-            elif int(choose) == 5:
-                pass
+                self.query_db()
             
 
             # Exits the loop
-            elif int(choose) == 6:
+            elif int(choose) == 5:
                 break
             
 
             elif int(choose) == 0:
-                self.create_table_from_csv()
+                self.create_table()
 
             else:
                 print("\nTry again")
