@@ -126,7 +126,6 @@
 <br>
 
 - This option will let the user convert rows they choose into a ```.csv``` file. I indicate which movies via their primaryTitle.
-- 
 ```python
     # OPTION 3
     # Choose movies and convert them into .csv
@@ -159,6 +158,7 @@
                 rows = csv.reader(csvfile)
                 # Iterates through all the rows
                 for row in rows:
+                    # This bit surrounds all values in a ''
                     for num in range(8):
                         row[num] = f"'{row[num]}'"
                     q2 = ",".join(row)
@@ -188,7 +188,8 @@
     # OPTION 5
     # Query the DB
     def query_db(self):
-        query = input("\nType your query:\n")
+        print("\nThis accepts only SELECT statements")
+        query = input("Type your query:\n")
         try:
             y = self.cursor.execute(query)
             for row in y:
@@ -199,7 +200,9 @@
 
 <br>
 
-- The following defines which choices the user has.
+- The following defines which choices the user has. 
+- The first ```if``` statement is meant to catch any errors associated with casting a string that isn't entirely composed of digits.
+
 ```python
     def choices(self):
         while True:
@@ -209,7 +212,7 @@
                     0. Convert the .csv file into a table in the Database
                     1. Show all movie data
                     2. Search movies by title and return data
-                    3. Choose movies and convert their data into a .txt file
+                    3. Choose movies and convert their data into a .csv file
                     4. Query the database
                     5. EXIT
                     """)

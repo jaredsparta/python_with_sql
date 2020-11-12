@@ -135,7 +135,8 @@ class ProductsManager:
     # OPTION 5
     # Query the DB
     def query_db(self):
-        query = input("\nType your query:\n")
+        print("\nThis accepts only SELECT statements")
+        query = input("Type your query:\n")
         try:
             y = self.cursor.execute(query)
             for row in y:
