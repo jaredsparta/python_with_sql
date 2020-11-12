@@ -17,13 +17,40 @@ class ProductsManager:
     # Should be the first option - creates a table from .csv file
     def create_table_from_csv(self):
         csv_file = input("\nGive the relative path to the .csv file: ")
-        table_names = []
+        table_name = input("What should the table be called? ")
+        col_names = []
         with open(csv_file, newline='') as csvfile:
             rows = csv.reader(csvfile)
             for r in rows:
-                table_names = r
+                col_names = r
                 break
-        print(table_names)
+
+        query_2 = ""
+        for name in col_names:
+            query_2 += name + " varchar(255),"
+        print(query_2)
+        query_2 = query_2[12:len(query_2)-1]     
+        
+        query = ascii(f"CREATE TABLE {table_name} ({query_2}) ")
+        print(query)
+        #try:
+        #    self.cursor.execute(query)
+        #    self.commit()
+        #except:
+        #    return print("Something went wrong!")
+        #
+        #print("\nTable created!")
+        #input("Press <ENTER> to put all values in the table")
+        #col_names2 = ",".join(col_names)
+        #with open(csv_file, newline='', fileEncoding="UTF-8-BOM") as csvfile:
+        #    rows = csv.reader(csvfile)
+        #    next(iter(rows))
+        #    for row in rows:
+        #        q2 = ",".join(row)
+        #        q = f"INSERT INTO {table_name} ({col_names2}) VALUES ({q2})"
+        #        self.cursor.execute(q)
+        #        self.commit()
+
 
     # OPTION 1
     # Shows all the data for the films
@@ -34,14 +61,18 @@ class ProductsManager:
     # Search data by film title
     def show_data_for_title(self):
         title = input("\nWhat title are you looking for? ")
-        pass
+        query = f"SELECT * FROM Movies WHERE primaryTitle = {title}"
+        try:
+            self.cursor.execute(query)
+        except:
+            return print("Something went wrong!")
 
     def choices(self):
         while True:
             # Shows options the user can do
             print("""
                     Options:
-                    0. Convert a .csv file into a table in the Database
+                    0. Convert the .csv file into a table in the Database
                     1. Show all movie data
                     2. Search movies by title and return data
                     3. Choose movies and convert their data into a .txt file

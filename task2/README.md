@@ -3,4 +3,4 @@
 ![](images/task2.png)
 
 **Limitations**
-- When converting a ```.csv``` file into a table in the database, there is no efficient way to retrieve actual datatypes automatically (we would probably need some form of machine learning algorithm to identify which values should be an int etc.)
+- Sometimes, when the ```csv``` file is not properly encoded as utf-8 some weird characters are found, breaking the program. This was fixed using the ```ascii()``` method found in Python3 but is not at all the optimal way to solve it.
