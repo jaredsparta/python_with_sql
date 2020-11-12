@@ -120,7 +120,7 @@
             y = self.cursor.execute(query).fetchone()
             print(y)
         except:
-            return print("Something went wrong!")
+            return print("Not found or something went wrong")
 ```
 
 <br>
@@ -131,7 +131,7 @@
     # OPTION 3
     # Choose movies and convert them into .csv
     def make_into_csv(self):
-        name = input("\nWhat is the name of the .csv file? (please include .csv at the end) " )
+        name = input("\nChoose the name of the .csv file? (please include .csv at the end) " )
         films = input("Please list the primaryTitle of each film you want to export separated by commas:\n")
         film_list = films.split(",")
         try:
