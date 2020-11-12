@@ -56,8 +56,11 @@
                         endYear varchar(255),
                         runtimeMinutes varchar(255),
                         genres varchar(255))"""
-        self.cursor.execute(query)
-        self.connection.commit()
+        try:
+            self.cursor.execute(query)
+            self.connection.commit()
+        except:
+            return print("Table exists!")
     
         # This will open the csv file and insert data one-by-one into the table
         with open("task2/imdbtitles.csv", newline='') as csvfile:
@@ -95,9 +98,12 @@
     # OPTION 1
     # Shows all the data for the films
     def show_all_movies(self):
-        x = self.cursor.execute("SELECT * FROM Movies")
-        for _ in x:
-            print(x)
+        try:
+            x = self.cursor.execute("SELECT * FROM Movies")
+            for _ in x:
+                print(x)
+        except:
+            print("\nError! Are you sure there's a table called Movies?")
 
 ```
 
@@ -128,11 +134,14 @@
         name = input("\nWhat is the name of the .csv file? (please include .csv at the end) " )
         films = input("Please list the primaryTitle of each film you want to export separated by commas:\n")
         film_list = films.split(",")
-        with open(f"task2/{name}", "w", newline="") as file:
-            writer = csv.writer(file)
-            for film in film_list:
-                y = self.cursor.execute(f"SELECT * FROM Movies WHERE primaryTitle = '{film.strip()}'").fetchone()
-                writer.writerow(y)
+        try:
+            with open(f"task2/{name}", "w", newline="") as file:
+                writer = csv.writer(file)
+                for film in film_list:
+                    y = self.cursor.execute(f"SELECT * FROM Movies WHERE primaryTitle = '{film.strip()}'").fetchone()
+                    writer.writerow(y)
+        except:
+            print("\nSomething went wrong!")
 ```
 
 <br>
