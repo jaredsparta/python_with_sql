@@ -2,6 +2,8 @@
 
 ![](images/task2.png)
 
+**[2nd iteration]()**
+
 **Limitations**
 - Sometimes, when the ```csv``` file is not properly encoded as utf-8 some weird characters are found, breaking the program. To overcome this, I had to hardcode the column titles.
 - There was too much variation within ```.csv``` files to allow a more efficient way of creating tables to be done using my current knowledge. There could perhaps be a few python libraries I'm not aware of to fix this issue. Overall, with time allowed and my knowledge taken into consideration, this was the only way I saw how to achieve the acceptance criteria.
