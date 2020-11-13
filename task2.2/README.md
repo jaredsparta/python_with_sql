@@ -1,4 +1,7 @@
 # 2nd Iteration of Task 2
+
+**[1st Iteration](https://github.com/jaredsparta/python_with_sql/tree/master/task2)**
+
 **Testing**
 - The program does not work for ```.csv``` files that separate with ```;``` instead of commas. This is possibly due to the fact that the ```csv``` module works differently for them.
     - This can be seen if one tries to create a table with the ```access-code-password-recovery-code.csv``` file in the directory.
@@ -14,12 +17,11 @@
 <br>
 
 **Notes**
-- The first iteration can be found [here](https://github.com/jaredsparta/python_with_sql/tree/master/task2)
-- This one builds upon the first one and is more generalised.
+- This one builds upon the first iteration and is more generalised.
 - It can create a table from any ```.csv``` file, read data from a ```.csv``` file and write to a corresponding table etc.
 - The ```test.csv``` file was used to test option 2
-- **CHANGE THE SERVER, DB, USERNAME, PASSWORD** found in the file for you to use
-- **Try to keep ```.csv``` files in the same directory as the ```main.py``` file and keep track of where your running the python interpreter from**
+- **CHANGE THE SERVER, DB, USERNAME, PASSWORD** found in the ```main.py``` to ensure the code runs fine.
+- **Try to keep ```.csv``` files in the same directory as the ```main.py``` file and keep track of where you're running the python interpreter from**
 
 <br>
 
