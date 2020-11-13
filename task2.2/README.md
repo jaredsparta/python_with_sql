@@ -4,7 +4,7 @@
 - I tested the ```create_table``` method on several test files including:
     1. ```annual-enterprise-survey-2019-financial-year-provisional-csv.csv```
         - Very large file, around ~33000 entries. Created a table in around a minute.
-        - A caveat, however: the tests were conducted on a local SQL server.
+        - A caveat, however: the tests were conducted on a local SQL server, thus eliminating connectivity issues. There could be a problem if queries take much longer to actually apply due to server issues on remote servers.
     2. ```color_srgb.csv```
         - Only 16 values, completed instantly.
     3. ```count_uk.csv```
