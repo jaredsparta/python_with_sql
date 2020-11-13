@@ -1,4 +1,16 @@
 # 2nd Iteration of Task 2
+**Testing**
+- The program does not work for ```.csv``` files that separate with ```;``` instead of commas. This is possibly due to the fact that the ```csv``` module works differently for them.
+- I tested the ```create_table``` method on several test files including:
+    1. ```annual-enterprise-survey-2019-financial-year-provisional-csv.csv```
+        - Very large file, around ~33000 entries. Created a table in around a minute.
+        - A caveat, however: the tests were conducted on a local SQL server.
+    2. ```color_srgb.csv```
+        - Only 16 values, completed instantly.
+    3. ```count_uk.csv```
+        - Similarly, much smaller than the first file and created it instantly.
+
+<br>
 
 **Notes**
 - The first iteration can be found [here](https://github.com/jaredsparta/python_with_sql/tree/master/task2)
@@ -36,7 +48,7 @@
 
 
     # Removes all non-alphanumeric characters from a list of strings
-    # This makes use oif the above function and applies it to all values
+    # This makes use of the above function and applies it to all values
     def remove_weird_characters_from_list(self, list_of_strings):
         retr = list(map(self.remove_weird_characters, list_of_strings))
         return retr
