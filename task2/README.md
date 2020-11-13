@@ -1,8 +1,8 @@
 # Task 2
 
-![](images/task2.png)
+**[2nd iteration](https://github.com/jaredsparta/python_with_sql/tree/master/task2.2)**
 
-**[2nd iteration]()**
+![](images/task2.png)
 
 **Limitations**
 - Sometimes, when the ```csv``` file is not properly encoded as utf-8 some weird characters are found, breaking the program. To overcome this, I had to hardcode the column titles.
