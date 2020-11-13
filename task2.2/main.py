@@ -1,8 +1,6 @@
 import pyodbc
 import csv
 from formatter import Formatter
-from csv_functions import CSVFunctions
-
 
 class SQLManager(Formatter):
     def __init__(self, server, database, username, password):
@@ -32,6 +30,7 @@ class SQLManager(Formatter):
                     WHERE TABLE_NAME = '{table_name}'
                     ORDER BY ORDINAL_POSITION"""
         row = self.cursor.execute(query)
+        # I return it in a list for ease of visiblity - much more friendly than separate lines
         retr = []
         for _ in row:
             for val in _:
@@ -42,7 +41,7 @@ class SQLManager(Formatter):
     # OPTION 1
     # CHECKED = YES
     def create_table(self):
-        # Creating the query and running it is the best way to do it
+        # Asks for the .csv file path
         csv_file = input("\nInput path to .csv file:\n")
 
         # If the file path is incorrect then this will cause an error
@@ -56,6 +55,7 @@ class SQLManager(Formatter):
         table_name = input("\nWhat should the table be called?\n")
 
         # This will format all the headings by removing non-alphanumeric characters
+        # This solves the limitations mentioned in iteration 1
         column_names = self.remove_weird_characters_from_list(csv_file_headings)
         column_names_with_datatype = list(map(lambda x: x + " varchar(255)", column_names))
         col_names_for_query = ",".join(column_names_with_datatype)
@@ -68,12 +68,18 @@ class SQLManager(Formatter):
         except:
             return print("\nTable exists!")
 
-
+        # Puts the column names in the correct format for adding to a query
         col_in_query = ",".join(column_names)
         with open(csv_file, newline='') as data:
             reader = csv.reader(data)
+            # This assumes the first line of the .csv file is the column names
+            # This will ensure they won't be added to the table as the first row
             next(iter(reader))
+
+            # This block will loop through all the rows in the file and add them
+            # to the table at every loop
             for row in reader:
+                # This will remove non alpha-numeric characters
                 retr = list(map(self.format_for_insertion, row))
                 retr = ",".join(retr)
                 query = f"INSERT INTO {table_name} ({col_in_query}) VALUES ({retr})"
@@ -95,40 +101,51 @@ class SQLManager(Formatter):
         table_name = input("\nInput table name:\n")
         csv_file = input("\nInput path to .csv file:\n")
 
+        # Retrieves the column names and makes them ready for querying as a string
         col_names = self.make_column_names_of_table(table_name)
         col_names_as_string = ", ".join(col_names)
-        
-        with open(csv_file, newline='') as data:
-            reader = csv.reader(data)
-            for row in reader:
-                retr = list(map(self.format_for_insertion, row))
-                retr = ",".join(retr)
-                query = f"INSERT INTO {table_name} ({col_names_as_string}) VALUES ({retr})"
-                
-                try:
-                    self.cursor.execute(query)
-                    self.connection.commit()
-                except:
-                    continue
 
+        # Errors can occur if the csv file doesnt exist etc.
+        try:    
+            # Goes through line by line in the csv file and adds them to the table
+            with open(csv_file, newline='') as data:
+                reader = csv.reader(data)
+                for row in reader:
+                    retr = list(map(self.format_for_insertion, row))
+                    retr = ",".join(retr)
+                    query = f"INSERT INTO {table_name} ({col_names_as_string}) VALUES ({retr})"
+
+                    try:
+                        self.cursor.execute(query)
+                        self.connection.commit()
+                    except:
+                        continue
+        except:
+            return print("\nSomething went wrong!")
 
     # OPTION 3
     # CHECKED = YES
     # Get values from a table and put it into a .csv file
     def table_to_csv(self):
+        # Shows tables to get data from
         self.show_possible_tables()
         table_name = input("\nInput table name:\n")
 
+        # Prints the columns to choose from
         print("")
         print(self.make_column_names_of_table(table_name))
         column_name_to_identify = input("\nWhich column to grab the data?\n")
 
+
+        # Grabs the rows to grab 
         values = input(f"\nFrom {column_name_to_identify} type the rows to grab: (separate by commas)\n")
 
         retr_list = values.split(",")
 
         csv_name = input("\nName the new .csvfile: (end it with a .csv)\n")
 
+        # Possible errors if the names dont exist etc.
+        # This catches them
         try:
             with open(csv_name, "w", newline="") as file:
                 writer = csv.writer(file)
@@ -167,25 +184,31 @@ class SQLManager(Formatter):
                     """)
             choose = input("--->  ").strip()
 
+
             if choose == "1":
                 self.create_table()
+
 
             elif choose == "2":
                 self.csv_to_table() 
             
+
             elif choose == "3":
                 self.table_to_csv()
             
+
             elif choose == "4":
                 self.query_db()   
+
 
             elif choose == "5":
                 break
 
+
             else:
                 print("\nTry again")
 
-
+# Input your own server, database, username and password to use this manager
 if __name__ == "__main__":
     server = "JaredPC\JS_1"
     database = "TASK"

@@ -1,3 +1,5 @@
+import csv
+
 class Formatter:
     def __init__(self):
         pass
@@ -40,4 +42,4 @@ class Formatter:
 # This is used to test the class above
 if __name__ == "__main__":
     f  = Formatter()
-    print(f.format_for_insertion("Heath's"))
+    print(f.get_headings("imdbtitles.csv"))
