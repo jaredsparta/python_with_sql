@@ -110,6 +110,7 @@ class SQLManager(Formatter):
             # Goes through line by line in the csv file and adds them to the table
             with open(csv_file, newline='') as data:
                 reader = csv.reader(data)
+                next(iter(reader))
                 for row in reader:
                     retr = list(map(self.format_for_insertion, row))
                     retr = ",".join(retr)
