@@ -15,7 +15,7 @@ class Formatter:
 
 
     # Removes all non-alphanumeric characters from a list of strings
-    # This makes use oif the above function and applies it to all values
+    # This makes use of the above function and applies it to all values
     def remove_weird_characters_from_list(self, list_of_strings):
         retr = list(map(self.remove_weird_characters, list_of_strings))
         return retr
