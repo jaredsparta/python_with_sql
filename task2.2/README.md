@@ -1,6 +1,7 @@
 # 2nd Iteration of Task 2
 **Testing**
 - The program does not work for ```.csv``` files that separate with ```;``` instead of commas. This is possibly due to the fact that the ```csv``` module works differently for them.
+    - This can be seen if one tries to create a table with the ```access-code-password-recovery-code.csv``` file in the directory.
 - I tested the ```create_table``` method on several test files including:
     1. ```annual-enterprise-survey-2019-financial-year-provisional-csv.csv```
         - Very large file, around ~33000 entries. Created a table in around a minute.
